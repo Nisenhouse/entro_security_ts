@@ -11,9 +11,19 @@ async function main() {
   if (token) {
     inputData.token = token;
   }
-  console.table(inputData);
-  const commits = await getCommits(inputData.owner, inputData.repo, inputData.token)
-  console.log(commits);
+  await checkRepo(inputData.owner, inputData.repo, inputData.token);
+}
+
+async function checkRepo(owner : string, repo : string, token: string) {
+  const commits = await getCommits(owner, repo, token);
+  commits.forEach(async (commit) => {
+    const url = commit.url;
+    const files = await getCommitFiles(url, token);
+    files.forEach((file) => {
+      const patch = file.patch;
+      /* TODO:*/
+    });
+  });
 }
 
 function getRequestOpts(token: string) : RequestInit {
@@ -34,8 +44,15 @@ async function getCommits(owner: string, repo: string, token: string) {
   if (response.status != 200) {
     return null;
   }
-  const data = await response.json();
-  return data;
+  return await response.json();
+}
+
+async function getCommitFiles(url: string, token: string) {
+  const response = await fetch(url, getRequestOpts(token));
+  if (response.status != 200) {
+    return null;
+  }
+  return (await response.json()).files;
 }
 
 // getInput().then((data : InputData) => {
