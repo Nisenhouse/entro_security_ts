@@ -1,4 +1,5 @@
 import {getInput, InputData} from './input';
+import {token} from './secret/tokenSecret'
 
 async function main() {
   //const inputData = await getInput();
@@ -7,6 +8,9 @@ async function main() {
     repo: "entro_security",
     token: "xxxx"
   };
+  if (token) {
+    inputData.token = token;
+  }
   console.table(inputData);
   const commits = await getCommits(inputData.owner, inputData.repo, inputData.token)
   console.log(commits);
